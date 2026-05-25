@@ -15,6 +15,7 @@ final class FocusStore: ObservableObject {
     @Published var todayGoalMinutes: Int?
     @Published var customModeName = "自定义"
     @Published var customModeSymbol = "slider.horizontal.3"
+    @Published var language: AppLanguage = .chinese
     @Published var settlement: FocusSession?
     @Published var timerPhase: TimerPhase = .focus
     @Published var timerIsRunning = false
@@ -24,12 +25,12 @@ final class FocusStore: ObservableObject {
 
     var modes: [FocusMode] {
         [
-        FocusMode(id: .study, name: "学习", focusMinutes: 25, breakMinutes: 5, theme: .blue, symbol: "graduationcap"),
-        FocusMode(id: .work, name: "工作", focusMinutes: 45, breakMinutes: 10, theme: .slate, symbol: "briefcase"),
-        FocusMode(id: .reading, name: "阅读", focusMinutes: 30, breakMinutes: 5, theme: .purple, symbol: "book"),
-        FocusMode(id: .creation, name: "创作", focusMinutes: 60, breakMinutes: 10, theme: .orange, symbol: "paintpalette"),
-        FocusMode(id: .light, name: "轻专注", focusMinutes: 15, breakMinutes: 3, theme: .green, symbol: "cup.and.saucer"),
-        FocusMode(id: .custom, name: customModeName, focusMinutes: 25, breakMinutes: 5, theme: .blue, symbol: customModeSymbol)
+        FocusMode(id: .study, name: language.text("学习", "Study"), focusMinutes: 25, breakMinutes: 5, theme: .blue, symbol: "graduationcap"),
+        FocusMode(id: .work, name: language.text("工作", "Work"), focusMinutes: 45, breakMinutes: 10, theme: .slate, symbol: "briefcase"),
+        FocusMode(id: .reading, name: language.text("阅读", "Reading"), focusMinutes: 30, breakMinutes: 5, theme: .purple, symbol: "book"),
+        FocusMode(id: .creation, name: language.text("创作", "Creation"), focusMinutes: 60, breakMinutes: 10, theme: .orange, symbol: "paintpalette"),
+        FocusMode(id: .light, name: language.text("轻专注", "Light Focus"), focusMinutes: 15, breakMinutes: 3, theme: .green, symbol: "cup.and.saucer"),
+        FocusMode(id: .custom, name: localizedCustomModeName, focusMinutes: 25, breakMinutes: 5, theme: .blue, symbol: customModeSymbol)
         ]
     }
 
@@ -40,6 +41,13 @@ final class FocusStore: ObservableObject {
     ]
 
     var theme: ThemeID { themeID }
+
+    var localizedCustomModeName: String {
+        if customModeName == "自定义" || customModeName == "Custom" {
+            return language.text("自定义", "Custom")
+        }
+        return customModeName
+    }
 
     init() {
         load()
@@ -64,7 +72,7 @@ final class FocusStore: ObservableObject {
 
     func updateCustomMode(name: String, symbol: String) {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        customModeName = trimmed.isEmpty ? "自定义" : trimmed
+        customModeName = trimmed.isEmpty ? language.text("自定义", "Custom") : trimmed
         customModeSymbol = symbol
         activeModeID = .custom
         save()
@@ -273,12 +281,12 @@ final class FocusStore: ObservableObject {
     }
 
     func taskName(for id: UUID?) -> String {
-        guard let id else { return "未绑定任务" }
-        return tasks.first(where: { $0.id == id })?.name ?? "已删除任务"
+        guard let id else { return language.text("未绑定任务", "No linked task") }
+        return tasks.first(where: { $0.id == id })?.name ?? language.text("已删除任务", "Deleted task")
     }
 
     func modeName(for id: FocusModeID) -> String {
-        modes.first(where: { $0.id == id })?.name ?? "未知模式"
+        modes.first(where: { $0.id == id })?.name ?? language.text("未知模式", "Unknown mode")
     }
 
     func modeSymbol(for id: FocusModeID) -> String {
@@ -336,6 +344,7 @@ final class FocusStore: ObservableObject {
             todayGoalMinutes = initial.todayGoalMinutes
             customModeName = initial.customModeName ?? "自定义"
             customModeSymbol = initial.customModeSymbol ?? "slider.horizontal.3"
+            language = initial.language ?? .chinese
             return
         }
         tasks = decoded.tasks
@@ -349,6 +358,7 @@ final class FocusStore: ObservableObject {
         todayGoalMinutes = decoded.todayGoalMinutes
         customModeName = decoded.customModeName ?? "自定义"
         customModeSymbol = decoded.customModeSymbol ?? "slider.horizontal.3"
+        language = decoded.language ?? .chinese
     }
 
     func save() {
@@ -363,7 +373,8 @@ final class FocusStore: ObservableObject {
             todayGoalText: todayGoalText,
             todayGoalMinutes: todayGoalMinutes,
             customModeName: customModeName,
-            customModeSymbol: customModeSymbol
+            customModeSymbol: customModeSymbol,
+            language: language
         )
         if let encoded = try? JSONEncoder.app.encode(data) {
             try? encoded.write(to: fileURL, options: .atomic)

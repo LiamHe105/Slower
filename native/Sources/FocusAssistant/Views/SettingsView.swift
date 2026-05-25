@@ -5,14 +5,14 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Picker("默认主题", selection: $store.themeID) {
+            Picker(store.language.text("默认主题", "Default Theme"), selection: $store.themeID) {
                 ForEach(ThemeID.allCases) { theme in
-                    Text(theme.name).tag(theme)
+                    Text(theme.name(language: store.language)).tag(theme)
                 }
             }
 
-            Stepper("自定义专注 \(store.customFocusMinutes) 分钟", value: $store.customFocusMinutes, in: 1...120)
-            Stepper("自定义休息 \(store.customBreakMinutes) 分钟", value: $store.customBreakMinutes, in: 1...30)
+            Stepper(store.language.text("自定义专注 \(store.customFocusMinutes) 分钟", "Custom focus \(store.customFocusMinutes) min"), value: $store.customFocusMinutes, in: 1...120)
+            Stepper(store.language.text("自定义休息 \(store.customBreakMinutes) 分钟", "Custom break \(store.customBreakMinutes) min"), value: $store.customBreakMinutes, in: 1...30)
         }
         .padding()
         .onChange(of: store.themeID) { _, _ in store.save() }
@@ -20,4 +20,3 @@ struct SettingsView: View {
         .onChange(of: store.customBreakMinutes) { _, _ in store.save() }
     }
 }
-

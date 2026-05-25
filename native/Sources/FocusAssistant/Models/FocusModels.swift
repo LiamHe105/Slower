@@ -11,12 +11,12 @@ enum AppPage: String, Identifiable {
 
     static let allCases: [AppPage] = [.focus, .tasks, .calendar]
 
-    var title: String {
+    func title(language: AppLanguage) -> String {
         switch self {
-        case .focus: "专注"
-        case .tasks: "任务"
-        case .calendar: "日历"
-        case .stats: "统计"
+        case .focus: language.text("专注", "Focus")
+        case .tasks: language.text("任务", "Tasks")
+        case .calendar: language.text("日历", "Calendar")
+        case .stats: language.text("统计", "Stats")
         }
     }
 
@@ -39,13 +39,13 @@ enum ThemeID: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
-    var name: String {
+    func name(language: AppLanguage) -> String {
         switch self {
-        case .blue: "冷静蓝"
-        case .green: "自然绿"
-        case .orange: "活力橙"
-        case .purple: "创意紫"
-        case .slate: "曜石黑"
+        case .blue: language.text("冷静蓝", "Calm Blue")
+        case .green: language.text("自然绿", "Natural Green")
+        case .orange: language.text("活力橙", "Vital Orange")
+        case .purple: language.text("创意紫", "Creative Purple")
+        case .slate: language.text("曜石黑", "Obsidian")
         }
     }
 

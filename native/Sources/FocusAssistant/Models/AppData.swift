@@ -12,6 +12,7 @@ struct AppData: Codable {
     var todayGoalMinutes: Int?
     var customModeName: String?
     var customModeSymbol: String?
+    var language: AppLanguage?
 
     static let empty = AppData(
         tasks: [
@@ -27,6 +28,7 @@ struct AppData: Codable {
         todayGoalText: nil,
         todayGoalMinutes: nil,
         customModeName: nil,
-        customModeSymbol: nil
+        customModeSymbol: nil,
+        language: .chinese
     )
 }

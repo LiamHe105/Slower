@@ -52,7 +52,7 @@ struct FocusView: View {
                     Image(systemName: "target")
                     Text(task.name)
                         .lineLimit(1)
-                    Button("取消") { store.selectedTaskID = nil }
+                    Button(store.language.text("取消", "Clear")) { store.selectedTaskID = nil }
                         .buttonStyle(.borderless)
                 }
                 .font(.callout)
@@ -60,7 +60,7 @@ struct FocusView: View {
                 .padding(.vertical, 8)
                 .background(store.theme.soft, in: Capsule())
             } else {
-                Text("未绑定任务，专注记录仍会保存")
+                Text(store.language.text("未绑定任务，专注记录仍会保存", "No linked task. Focus records will still be saved."))
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -81,13 +81,13 @@ struct FocusView: View {
                 .rotationEffect(.degrees(-90))
                 .animation(.easeOut(duration: 0.2), value: progress)
             VStack(spacing: 8) {
-                Text(store.timerPhase == .focus ? store.activeMode.name : "休息")
+                Text(store.timerPhase == .focus ? store.activeMode.name : store.language.text("休息", "Break"))
                     .font(.headline)
                     .foregroundStyle(store.theme.primary)
                 Text(clockText(remain))
                     .font(.system(size: 54, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                Text(store.timerIsRunning ? "进行中" : "暂停")
+                Text(store.timerIsRunning ? store.language.text("进行中", "Running") : store.language.text("暂停", "Paused"))
                     .foregroundStyle(.secondary)
             }
         }
@@ -99,14 +99,14 @@ struct FocusView: View {
             Button {
                 store.resetTimer()
             } label: {
-                Label("重置", systemImage: "arrow.counterclockwise")
+                Label(store.language.text("重置", "Reset"), systemImage: "arrow.counterclockwise")
             }
             .keyboardShortcut("r")
 
             Button {
                 store.toggleTimer(now: now)
             } label: {
-                Label(store.timerIsRunning ? "暂停" : "开始", systemImage: store.timerIsRunning ? "pause.fill" : "play.fill")
+                Label(store.timerIsRunning ? store.language.text("暂停", "Pause") : store.language.text("开始", "Start"), systemImage: store.timerIsRunning ? "pause.fill" : "play.fill")
                     .frame(width: 120)
             }
             .buttonStyle(.borderedProminent)
@@ -116,7 +116,7 @@ struct FocusView: View {
             Button {
                 store.finishTimerEarly(now: now)
             } label: {
-                Label("结束并记录", systemImage: "stop.fill")
+                Label(store.language.text("结束并记录", "Finish & Log"), systemImage: "stop.fill")
             }
             .disabled(!store.timerIsRunning && store.timerStartedAt == nil)
         }
@@ -128,7 +128,7 @@ struct FocusView: View {
             Button("25/5") { store.setTimerDurations(focus: 25, breakMinutes: 5) }
             Button("45/10") { store.setTimerDurations(focus: 45, breakMinutes: 10) }
             Button("60/10") { store.setTimerDurations(focus: 60, breakMinutes: 10) }
-            Button("自定义") { showingCustom = true }
+            Button(store.language.text("自定义", "Custom")) { showingCustom = true }
         }
         .buttonStyle(.bordered)
         .disabled(store.timerIsRunning)
@@ -147,7 +147,7 @@ struct ModePanel: View {
     var body: some View {
         SectionCard {
             VStack(alignment: .leading, spacing: 14) {
-                Label("专注模式", systemImage: "slider.horizontal.3")
+                Label(store.language.text("专注模式", "Focus Mode"), systemImage: "slider.horizontal.3")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundStyle(store.theme.primary)
 
@@ -195,7 +195,7 @@ struct TaskMiniPanel: View {
     var body: some View {
         SectionCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("选择任务")
+                Text(store.language.text("选择任务", "Choose Task"))
                     .font(.headline)
                 let orderedTasks = store.tasks.sorted { first, second in
                     if first.completed != second.completed {
@@ -204,7 +204,7 @@ struct TaskMiniPanel: View {
                     return first.createdAt > second.createdAt
                 }
                 if orderedTasks.isEmpty {
-                    Text("请在“待办清单”设置今日任务")
+                    Text(store.language.text("请在“待办清单”设置今日任务", "Set today's tasks in Tasks."))
                         .foregroundStyle(.secondary)
                         .font(.system(size: 13, weight: .semibold))
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -259,9 +259,9 @@ struct CustomDurationView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("自定义模式")
+            Text(store.language.text("自定义模式", "Custom Mode"))
                 .font(.title3.weight(.semibold))
-            TextField("模式名称", text: $modeName)
+            TextField(store.language.text("模式名称", "Mode name"), text: $modeName)
                 .textFieldStyle(.roundedBorder)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
@@ -280,11 +280,11 @@ struct CustomDurationView: View {
                 }
             }
 
-            Stepper("专注 \(store.customFocusMinutes) 分钟", value: $store.customFocusMinutes, in: 1...120)
-            Stepper("休息 \(store.customBreakMinutes) 分钟", value: $store.customBreakMinutes, in: 1...30)
+            Stepper(store.language.text("专注 \(store.customFocusMinutes) 分钟", "Focus \(store.customFocusMinutes) min"), value: $store.customFocusMinutes, in: 1...120)
+            Stepper(store.language.text("休息 \(store.customBreakMinutes) 分钟", "Break \(store.customBreakMinutes) min"), value: $store.customBreakMinutes, in: 1...30)
             HStack {
                 Spacer()
-                Button("完成") {
+                Button(store.language.text("完成", "Done")) {
                     store.updateCustomMode(name: modeName, symbol: selectedSymbol)
                     store.resetTimer()
                     store.save()

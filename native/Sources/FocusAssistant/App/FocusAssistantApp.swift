@@ -22,13 +22,21 @@ struct FocusAssistantApp: App {
         .windowStyle(.titleBar)
         .commands {
             CommandGroup(replacing: .newItem) { }
-            CommandMenu("主题") {
+            CommandMenu(store.language.text("主题", "Theme")) {
                 ForEach(ThemeID.allCases) { theme in
-                    Button(theme.name) {
+                    Button(theme.name(language: store.language)) {
                         store.themeID = theme
                         store.save()
                     }
                     .keyboardShortcut(theme.shortcut, modifiers: [.command, .option])
+                }
+            }
+            CommandMenu("Language") {
+                ForEach(AppLanguage.allCases) { language in
+                    Button(language.name) {
+                        store.language = language
+                        store.save()
+                    }
                 }
             }
         }

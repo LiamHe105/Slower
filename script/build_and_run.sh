@@ -10,6 +10,7 @@ APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 EXEC_PATH="$NATIVE_DIR/.build/arm64-apple-macosx/debug/$PRODUCT_NAME"
 BUNDLE_EXECUTABLE="FocusAssistant"
 BUILD_CACHE_DIR="$NATIVE_DIR/.build/cache"
+ICON_FILE="$NATIVE_DIR/Resources/AppIcon.icns"
 
 mkdir -p "$BUILD_CACHE_DIR/clang" "$BUILD_CACHE_DIR/swiftpm" "$DIST_DIR"
 export CLANG_MODULE_CACHE_PATH="$BUILD_CACHE_DIR/clang"
@@ -25,8 +26,11 @@ cd "$NATIVE_DIR"
 swift build --disable-sandbox --scratch-path "$NATIVE_DIR/.build"
 
 rm -rf "$APP_BUNDLE"
-mkdir -p "$APP_BUNDLE/Contents/MacOS"
+mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 cp "$EXEC_PATH" "$APP_BUNDLE/Contents/MacOS/$BUNDLE_EXECUTABLE"
+if [[ -f "$ICON_FILE" ]]; then
+  cp "$ICON_FILE" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
+fi
 chmod +x "$APP_BUNDLE/Contents/MacOS/$BUNDLE_EXECUTABLE"
 printf "APPL????" > "$APP_BUNDLE/Contents/PkgInfo"
 
@@ -43,6 +47,8 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
   <string>Slower</string>
   <key>CFBundleDisplayName</key>
   <string>Slower</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>

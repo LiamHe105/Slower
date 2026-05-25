@@ -18,3 +18,6 @@ func minutesText(_ seconds: TimeInterval) -> String {
     "\(Int((seconds / 60).rounded())) 分钟"
 }
 
+func minutesText(_ seconds: TimeInterval, language: AppLanguage) -> String {
+    language.minutes(seconds)
+}

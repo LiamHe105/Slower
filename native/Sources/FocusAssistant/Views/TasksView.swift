@@ -29,8 +29,8 @@ struct TasksView: View {
             goalText = store.activeTodayGoalText
             goalMinutesText = "\(store.activeTodayGoalMinutes ?? 120)"
         }
-        .alert("请输入合适的时间哟～", isPresented: $showInvalidGoalAlert) {
-            Button("知道了", role: .cancel) { }
+        .alert(store.language.text("请输入合适的时间哟～", "Please enter a valid time."), isPresented: $showInvalidGoalAlert) {
+            Button(store.language.text("知道了", "OK"), role: .cancel) { }
         }
     }
 
@@ -39,15 +39,15 @@ struct TasksView: View {
             VStack(alignment: .leading, spacing: 20) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 5) {
-                        Label("今日任务清单", systemImage: "checkmark.circle")
+                        Label(store.language.text("今日任务清单", "Today's Tasks"), systemImage: "checkmark.circle")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(store.theme.primary)
-                        Text("创建今天要推进的任务")
+                        Text(store.language.text("创建今天要推进的任务", "Create the tasks you want to move forward today."))
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("待办 \(activeTasks.count)  /  已成 \(completedTasks.count)")
+                    Text(store.language.text("待办 \(activeTasks.count)  /  已成 \(completedTasks.count)", "Open \(activeTasks.count) / Done \(completedTasks.count)"))
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(store.theme.primary)
                         .padding(.horizontal, 14)
@@ -58,7 +58,7 @@ struct TasksView: View {
                 TaskFilterTabs(filter: $filter, active: activeTasks.count, completed: completedTasks.count, all: store.tasks.count)
 
                 HStack(spacing: 10) {
-                    TextField("今天打算专注于做什么？", text: $taskName)
+                    TextField(store.language.text("今天打算专注于做什么？", "What do you want to focus on today?"), text: $taskName)
                         .textFieldStyle(.plain)
                         .font(.system(size: 15, weight: .semibold))
                         .padding(.horizontal, 14)
@@ -84,7 +84,7 @@ struct TasksView: View {
                             Image(systemName: "checkmark.circle")
                                 .font(.system(size: 28))
                                 .foregroundStyle(.secondary.opacity(0.35))
-                            Text(filter == .active ? "没有待办，快去新增一个吧！" : "暂无任务")
+                            Text(filter == .active ? store.language.text("没有待办，快去新增一个吧！", "No open tasks. Add one.") : store.language.text("暂无任务", "No tasks yet."))
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundStyle(.secondary)
                         }
@@ -107,12 +107,12 @@ struct TasksView: View {
     private var todayGoalPanel: some View {
         SectionCard {
             VStack(alignment: .leading, spacing: 16) {
-                Label("今日目标", systemImage: "flag")
+                Label(store.language.text("今日目标", "Today's Goal"), systemImage: "flag")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundStyle(store.theme.primary)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("写给自己的话")
+                    Text(store.language.text("写给自己的话", "Note to yourself"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     TextField("", text: $goalText)
@@ -120,18 +120,18 @@ struct TasksView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("自律时长")
+                    Text(store.language.text("自律时长", "Target focus time"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     HStack {
-                        TextField("分钟数", text: $goalMinutesText)
+                        TextField(store.language.text("分钟数", "Minutes"), text: $goalMinutesText)
                             .textFieldStyle(.roundedBorder)
-                        Text("分钟")
+                        Text(store.language.text("分钟", "min"))
                             .foregroundStyle(.secondary)
                     }
                 }
 
-                Button("保存今日目标") {
+                Button(store.language.text("保存今日目标", "Save Today's Goal")) {
                     guard let minutes = Int(goalMinutesText.trimmingCharacters(in: .whitespacesAndNewlines)),
                           minutes > 0,
                           minutes <= 1440 else {
@@ -143,7 +143,7 @@ struct TasksView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(store.theme.primary)
 
-                Text("保存后会显示在左侧“今日奋斗目标”。")
+                Text(store.language.text("保存后会显示在左侧“今日奋斗目标”。", "After saving, it will appear in the sidebar goal card."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -173,9 +173,9 @@ struct TaskFilterTabs: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            tab(.active, "待完成 (\(active))")
-            tab(.completed, "已完成 (\(completed))")
-            tab(.all, "全部 (\(all))")
+            tab(.active, store.language.text("待完成 (\(active))", "Open (\(active))"))
+            tab(.completed, store.language.text("已完成 (\(completed))", "Done (\(completed))"))
+            tab(.all, store.language.text("全部 (\(all))", "All (\(all))"))
         }
         .padding(3)
         .background(store.theme.cardBackground, in: RoundedRectangle(cornerRadius: 13))
@@ -212,7 +212,7 @@ struct TaskRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 if isEditing {
-                    TextField("任务名称", text: $editingName)
+                    TextField(store.language.text("任务名称", "Task name"), text: $editingName)
                         .textFieldStyle(.roundedBorder)
                         .onSubmit(save)
                 } else {
@@ -221,7 +221,7 @@ struct TaskRow: View {
                         .strikethrough(task.completed)
                         .foregroundStyle(task.completed ? .secondary : .primary)
                 }
-                Text("累计 \(minutesText(task.totalFocusSeconds))")
+                Text(store.language.text("累计 \(minutesText(task.totalFocusSeconds))", "Total \(minutesText(task.totalFocusSeconds, language: store.language))"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

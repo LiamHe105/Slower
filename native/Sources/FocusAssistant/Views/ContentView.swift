@@ -124,7 +124,7 @@ struct SidebarRow: View {
                 Image(systemName: page.symbol)
                     .font(.system(size: 16, weight: .semibold))
                     .frame(width: 20)
-                Text(page.sidebarTitle)
+                Text(page.sidebarTitle(language: store.language))
                     .font(.system(size: 15, weight: .semibold))
                 Spacer()
             }
@@ -153,7 +153,7 @@ struct AppHeader: View {
                     .foregroundStyle(store.theme.primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
-                Text("在自律节拍中，寻找内心的专注与安宁。")
+                Text(store.language.text("在自律节拍中，寻找内心的专注与安宁。", "Slow your world, not your goals."))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -173,10 +173,7 @@ struct AppHeader: View {
     }
 
     private var headerDate: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy年M月d日 EEEE"
-        return formatter.string(from: Date())
+        return store.language.date(Date(), format: .header)
     }
 }
 
@@ -187,7 +184,7 @@ struct TodayGoalCard: View {
     var body: some View {
         let stats = store.stats()
         VStack(alignment: .leading, spacing: compact ? 8 : 12) {
-            Text("今日奋斗目标")
+            Text(store.language.text("今日奋斗目标", "Today's Goal"))
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.secondary)
             if let target = store.activeTodayGoalMinutes {
@@ -198,7 +195,7 @@ struct TodayGoalCard: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.65)
                     Spacer()
-                    Text("分钟")
+                    Text(store.language.text("分钟", "min"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
@@ -215,7 +212,7 @@ struct TodayGoalCard: View {
                         .controlSize(.small)
                 }
             } else {
-                Text("请前往“待办清单”设置今日目标！")
+                Text(store.language.text("请前往“待办清单”设置今日目标！", "Go to Tasks to set today's goal."))
                     .font(.system(size: compact ? 12 : 13, weight: .bold))
                     .foregroundStyle(store.theme.primary)
                     .lineLimit(3)
@@ -264,7 +261,7 @@ struct AuthorSupportView: View {
                     Text("@LiamHe")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(store.theme.primary)
-                    Text("一位 Aspiring 游戏策划 × AI 开发记录")
+                    Text(store.language.text("一位 Aspiring 游戏策划 × AI 开发记录", "Aspiring game designer × AI dev journal"))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
@@ -279,7 +276,7 @@ struct AuthorSupportView: View {
                 .buttonStyle(.plain)
             }
 
-            Text("""
+            Text(store.language.text("""
             软件工程学生 / aspiring game designer
 
             这里会分享我学习 vibe coding 的过程，
@@ -290,15 +287,23 @@ struct AuthorSupportView: View {
 
             如果你愿意支持我的创作，
             欢迎来和我一起见证这些项目从 0 到 1。
-            """)
+            """, """
+            Software engineering student / aspiring game designer
+
+            I share my vibe coding process here, along with AI tools, game ideas, and indie products I am building.
+
+            I am not a big-tech engineer, just someone slowly turning ideas into real things.
+
+            If you want to support my work, you are welcome to witness these projects going from 0 to 1.
+            """))
             .font(.system(size: 14, weight: .medium))
             .lineSpacing(5)
             .foregroundStyle(.primary)
 
             VStack(spacing: 10) {
                 supportLink("GitHub", systemImage: "chevron.left.forwardslash.chevron.right", url: "https://github.com/LiamHe105")
-                supportLink("爱发电", systemImage: "heart.fill", url: "https://ifdian.net/a/liamhe")
-                supportLink("抖音", systemImage: "play.rectangle.fill", url: "https://v.douyin.com/IJ0zrxYSCHA/")
+                supportLink(store.language.text("爱发电", "Afdian"), systemImage: "heart.fill", url: "https://ifdian.net/a/liamhe")
+                supportLink(store.language.text("抖音", "Douyin"), systemImage: "play.rectangle.fill", url: "https://v.douyin.com/IJ0zrxYSCHA/")
             }
         }
         .padding(26)
@@ -353,12 +358,12 @@ struct SectionCard<Content: View>: View {
 }
 
 extension AppPage {
-    var sidebarTitle: String {
+    func sidebarTitle(language: AppLanguage) -> String {
         switch self {
-        case .focus: "我的专注"
-        case .tasks: "待办清单"
-        case .calendar: "自律历程"
-        case .stats: "成效大观"
+        case .focus: language.text("我的专注", "Focus")
+        case .tasks: language.text("待办清单", "Tasks")
+        case .calendar: language.text("自律历程", "Journey")
+        case .stats: language.text("成效大观", "Stats")
         }
     }
 }

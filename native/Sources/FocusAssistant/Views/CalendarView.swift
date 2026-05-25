@@ -19,17 +19,17 @@ struct CalendarView: View {
             VStack(alignment: .leading, spacing: 24) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 5) {
-                        Label("打卡律动历", systemImage: "calendar")
+                        Label(store.language.text("打卡律动历", "Discipline Calendar"), systemImage: "calendar")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(store.theme.primary)
-                        Text("连续专注与日均坚持反馈")
+                        Text(store.language.text("连续专注与日均坚持反馈", "Track consistency and daily focus rhythm."))
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     HStack(spacing: 8) {
                         navButton("chevron.left") { moveMonth(-1) }
-                        Button("本月") {
+                        Button(store.language.text("本月", "This Month")) {
                             monthDate = Date()
                             selectedDate = Date()
                         }
@@ -71,7 +71,7 @@ struct CalendarView: View {
     }
 
     private var weekdayHeader: some View {
-        let names = ["日", "一", "二", "三", "四", "五", "六"]
+        let names = store.language == .chinese ? ["日", "一", "二", "三", "四", "五", "六"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
         return HStack {
             ForEach(names, id: \.self) { name in
                 Text(name)
@@ -107,20 +107,20 @@ struct CalendarView: View {
                 }
         }
         .buttonStyle(.plain)
-        .help("\(key) 专注 \(minutesText(seconds))")
+        .help(store.language.text("\(key) 专注 \(minutesText(seconds))", "\(key) focused \(minutesText(seconds, language: store.language))"))
         .frame(maxWidth: .infinity)
     }
 
     private var legend: some View {
         HStack(spacing: 12) {
-            Text("专注强度说明:")
+            Text(store.language.text("专注强度说明:", "Intensity:"))
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(.secondary)
             Spacer()
-            legendItem("<15分钟", color: store.theme.cardBackground)
-            legendItem("15分钟+", color: store.theme.primary.opacity(0.18))
-            legendItem("60分钟+", color: store.theme.primary.opacity(0.38))
-            legendItem("120分钟+", color: store.theme.primary)
+            legendItem(store.language.text("<15分钟", "<15 min"), color: store.theme.cardBackground)
+            legendItem(store.language.text("15分钟+", "15+ min"), color: store.theme.primary.opacity(0.18))
+            legendItem(store.language.text("60分钟+", "60+ min"), color: store.theme.primary.opacity(0.38))
+            legendItem(store.language.text("120分钟+", "120+ min"), color: store.theme.primary)
         }
     }
 
@@ -149,10 +149,7 @@ struct CalendarView: View {
     }
 
     private var monthTitle: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy年 M月"
-        return formatter.string(from: monthDate)
+        store.language.date(monthDate, format: .month)
     }
 
     private var days: [Int?] {
@@ -218,7 +215,7 @@ struct CalendarDetailPanel: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Label("日期详情", systemImage: "doc.text.magnifyingglass")
+            Label(store.language.text("日期详情", "Date Details"), systemImage: "doc.text.magnifyingglass")
                 .font(.system(size: 18, weight: .bold, design: .rounded))
                 .foregroundStyle(store.theme.primary)
             Text(selectedTitle)
@@ -235,21 +232,21 @@ struct CalendarDetailPanel: View {
         let monthMinutes = periodMinutes(containing: selectedDate, component: .month)
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-            detailMetric("当天专注", "\(minutes)", "分钟")
-            detailMetric("当天打卡", "\(tomatoes)", "次")
-            detailMetric("本周专注", "\(weekMinutes)", "分钟")
-            detailMetric("本月专注", "\(monthMinutes)", "分钟")
+            detailMetric(store.language.text("当天专注", "Selected Day"), "\(minutes)", store.language.text("分钟", "min"))
+            detailMetric(store.language.text("当天打卡", "Check-ins"), "\(tomatoes)", store.language.text("次", "x"))
+            detailMetric(store.language.text("本周专注", "This Week"), "\(weekMinutes)", store.language.text("分钟", "min"))
+            detailMetric(store.language.text("本月专注", "This Month"), "\(monthMinutes)", store.language.text("分钟", "min"))
         }
     }
 
     private var history: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("专注历史")
+            Text(store.language.text("专注历史", "Focus History"))
                 .font(.system(size: 15, weight: .bold))
 
             let sessions = store.sessions(on: selectedDate)
             if sessions.isEmpty {
-                Text("这一天还没有专注记录。")
+                Text(store.language.text("这一天还没有专注记录。", "No focus records on this day."))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -266,10 +263,10 @@ struct CalendarDetailPanel: View {
     private var noteEditor: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("当天小结")
+                Text(store.language.text("当天小结", "Daily Note"))
                     .font(.system(size: 15, weight: .bold))
                 Spacer()
-                Button(isEditingNote ? "保存" : "编辑") {
+                Button(isEditingNote ? store.language.text("保存", "Save") : store.language.text("编辑", "Edit")) {
                     if isEditingNote {
                         store.updateNote(draftNote, for: selectedDate)
                         isEditingNote = false
@@ -299,7 +296,7 @@ struct CalendarDetailPanel: View {
                         RoundedRectangle(cornerRadius: 12).stroke(store.theme.border)
                     }
             } else {
-                Text(draftNote.isEmpty ? "还没有写下当天小结。" : draftNote)
+                Text(draftNote.isEmpty ? store.language.text("还没有写下当天小结。", "No daily note yet.") : draftNote)
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(draftNote.isEmpty ? .secondary : .primary)
                     .lineSpacing(4)
@@ -344,10 +341,7 @@ struct CalendarDetailPanel: View {
     }
 
     private var selectedTitle: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy年M月d日 EEEE"
-        return formatter.string(from: selectedDate)
+        store.language.date(selectedDate, format: .header)
     }
 
     private func timeText(_ date: Date) -> String {
@@ -388,7 +382,7 @@ struct HistorySessionRow: View {
                         Text(store.modeName(for: session.modeID))
                             .foregroundStyle(store.theme.primary)
                         if session.isCompletedTomato {
-                            Text("达标")
+                                Text(store.language.text("达标", "Done"))
                                 .foregroundStyle(store.theme.primary)
                         }
                     }
@@ -417,13 +411,13 @@ struct HistorySessionRow: View {
                 isHovering = hovering
             }
         }
-        .alert("删除这条专注历史？", isPresented: $showingDeleteConfirm) {
-            Button("取消", role: .cancel) { }
-            Button("删除", role: .destructive) {
+        .alert(store.language.text("删除这条专注历史？", "Delete this focus record?"), isPresented: $showingDeleteConfirm) {
+            Button(store.language.text("取消", "Cancel"), role: .cancel) { }
+            Button(store.language.text("删除", "Delete"), role: .destructive) {
                 store.deleteSession(session)
             }
         } message: {
-            Text("删除后会同步扣回该任务累计专注时长。")
+            Text(store.language.text("删除后会同步扣回该任务累计专注时长。", "Deleting it will also subtract the time from the linked task total."))
         }
     }
 
