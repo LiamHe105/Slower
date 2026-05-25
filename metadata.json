@@ -1,0 +1,6 @@
+{
+  "name": "专注助手",
+  "description": "提供番茄工作法、自定义计时器、极简任务清单、打卡日历、专注统计和环境白噪音模块，采用 macOS/iOS 风格设计，支持本地持久化存储。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
